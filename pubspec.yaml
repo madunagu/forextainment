@@ -1,0 +1,59 @@
+name: forextainment
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.0
+  http: ^0.12.1  
+  flutter_secure_storage: ^3.3.5
+  bloc: ^4.0.0
+  flutter_bloc: ^4.0.0
+  meta: ^1.1.6
+  json_serializable: ^3.3.0
+  equatable: ^1.0.0
+  photo_view:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: 
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+flutter_icons:
+  image_path: "images/logo.png" 
+  android: true
+  ios: true
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-SemiBold.ttf
+        - asset: fonts/Montserrat-Bold.ttf
+        - asset: fonts/Montserrat-MediumItalic.ttf
+        - asset: fonts/Montserrat-Regular.ttf
+        - asset: fonts/CustomIcons.ttf
+  assets:
+    - images/icon.png
+    - images/logo.png
+    - images/name.png
+    - images/splash.png
+    - images/chart.png
+    - images/BULLISH.png
+    - images/BEARISH.png
