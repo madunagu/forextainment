@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:forextainment/Exceptions.dart';
 import 'package:forextainment/FullScreenImage.dart';
-import 'package:forextainment/NetworkingClass.dart';
 import 'package:forextainment/bloc/blocs/post.bloc.dart';
 import 'package:forextainment/bloc/events/PostEvent.dart';
 import 'package:forextainment/bloc/states/PostState.dart';
@@ -44,22 +42,15 @@ String formatDate(DateTime dateTime) {
   return "${weekdays[dateTime.weekday]} ${dateTime.day} ${months[dateTime.month]} ${dateTime.year}";
 }
 
-class ChartScreen extends StatefulWidget {
+class PostScreen extends StatefulWidget {
   final Category category;
 
-  ChartScreen({this.category});
+  PostScreen({this.category});
   @override
-  _ChartScreenState createState() => _ChartScreenState();
+  _PostScreenState createState() => _PostScreenState();
 }
 
-class _ChartScreenState extends State<ChartScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    BlocProvider.of<PostBloc>(context)
-        .add(PostLoaded(category: widget.category));
-    super.initState();
-  }
+class _PostScreenState extends State<PostScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -176,17 +167,21 @@ class ForexPost extends StatelessWidget {
                       fontSize: 18,
                     ),
                   ),
-                  Text(post.outlook),
-                  Center(
-                    child: Image.asset(
-                      post.outlook == 'BULLISH'
-                          ? 'images/BULLISH.png'
-                          : 'images/BEARISH.png',
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(post.outlook),
+                      Image.asset(
+                        post.outlook == 'BULLISH'
+                            ? 'images/bullish.png'
+                            : 'images/bearish.png',
 //                      width: 200,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
+                    ],
                   ),
+
                   SizedBox(height: 24),
                   ForexFigures(values: post.values),
                   SizedBox(height: 16),

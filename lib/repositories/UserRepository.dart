@@ -31,6 +31,32 @@ class UserRepository {
     return data;
   }
 
+  Future<LoginData> register({
+    @required String username,
+    @required String email,
+    @required String phone,
+    @required String firstName,
+    @required String lastName,
+    @required String password,
+  }) async {
+    NetworkingClass server = NetworkingClass();
+    final Map<String, dynamic> res = await server.post('/users/register', {
+      'username': username,
+      'password': password,
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone': phone,
+    });
+    //TODO: format wordpress logindata properly
+    LoginData data = LoginData(
+      user: User(
+      ),
+      token: 'mytoken',
+    );
+    return data;
+  }
+
   Future<void> deleteToken() async {
     await storage.delete(key: 'token');
     return;

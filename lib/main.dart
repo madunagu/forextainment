@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:forextainment/ChartScreen.dart';
+import 'package:forextainment/PostScreen.dart';
 import 'package:forextainment/LoginScreen.dart';
 import 'package:forextainment/NetworkingClass.dart';
 import 'package:forextainment/SplashScreen.dart';
@@ -14,6 +14,7 @@ import 'package:forextainment/bloc/blocs/category.bloc.dart';
 import 'package:forextainment/bloc/blocs/post.bloc.dart';
 import 'package:forextainment/bloc/blocs/login.bloc.dart';
 import 'package:forextainment/bloc/events/AuthenticationEvent.dart';
+import 'package:forextainment/bloc/events/PostEvent.dart';
 import 'package:forextainment/bloc/states/AuthenticationState.dart';
 import 'package:forextainment/bloc/states/category_state.dart';
 import 'package:forextainment/bloc/events/category_event.dart';
@@ -21,6 +22,7 @@ import 'package:forextainment/models/Category.dart';
 import 'package:forextainment/repositories/UserRepository.dart';
 import 'package:forextainment/models/Post.dart';
 import 'package:forextainment/widgets/LoadingIndicator.dart';
+import 'package:forextainment/widgets/TitleBar.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
@@ -33,7 +35,6 @@ void main() {
         ),
         BlocProvider<CategoryBloc>(
             create: (context) => CategoryBloc()..add(CategoryLoaded())),
-        BlocProvider<PostBloc>(create: (context) => PostBloc()),
         BlocProvider<LoginBloc>(
           create: (context) => LoginBloc(
             authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
@@ -111,166 +112,16 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<CategoryBloc, CategoryState>(
-      builder: (context, state) {
-        if (state is CategoryLoading) {
-          return ForexLoadingScreen();
-        }
-        if (state is CategorySuccess) {
-          return ForexLoadedScreen(
-            categories: state.categories,
-            state: widget.authState,
-          );
-        }
-        if (state is CategoryFailure) {
-          return ForexFailedScreen(message: state.message);
-        }
-        return Container();
-      },
-    );
-  }
-}
-
-class ForexLoadingScreen extends StatelessWidget {
-  const ForexLoadingScreen({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Container(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-
-        leading: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Image.asset(
-            'images/logo.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-        ),
-        // leadingWidth: 100,
-        title: TitleBar(),
-      ),
-    );
-  }
-}
-
-class TitleBar extends StatelessWidget {
-  const TitleBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          'FOREX',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xff0531ff),
-          ),
-        ),
-        Text(
-          'TAINMENT',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xffff4d00),
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class ForexFailedScreen extends StatelessWidget {
-  const ForexFailedScreen({Key key, this.message}) : super(key: key);
-  final String message;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.center,
-        child: GestureDetector(
-            onTap: () {
-              BlocProvider.of<CategoryBloc>(context).add(CategoryLoaded());
-              log('trying again.....');
-            },
-            child: Container(
-              color: Colors.transparent,
-              child: Column(
-                children: [
-                  SizedBox(height: 200),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text('Tap the icon to try again ...',
-                      style: TextStyle(color: Colors.grey)),
-                  SizedBox(height: 20),
-                  Icon(
-                    Icons.refresh,
-                    size: 26,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-            )),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Image.asset(
-            'images/logo.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-        ),
-        // leadingWidth: 100,
-        title: TitleBar(),
-      ),
-    );
-  }
-}
-
-class ForexLoadedScreen extends StatefulWidget {
-  ForexLoadedScreen({Key key, @required this.categories, @required this.state})
-      : super(key: key);
-  final List<Category> categories;
-  final AuthenticationState state;
-  @override
-  _ForexLoadedScreenState createState() => _ForexLoadedScreenState();
-}
-
-class _ForexLoadedScreenState extends State<ForexLoadedScreen>
-    with SingleTickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   TabController _tabController;
+
   @override
   void initState() {
     this._tabController = TabController(
-        vsync: this, length: widget.categories.length, initialIndex: 0);
+      vsync: this,
+      length: 0,
+      initialIndex: 0,
+    );
     super.initState();
   }
 
@@ -280,94 +131,184 @@ class _ForexLoadedScreenState extends State<ForexLoadedScreen>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+  Widget switchBody(CategoryState state) {
+    if (state is CategoryLoading) {
+      return Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Container(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+    if (state is CategoryFailure) {
+      return Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            BlocProvider.of<CategoryBloc>(context).add(CategoryLoaded());
+            log('trying again.....');
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                SizedBox(height: 200),
+                Text(
+                  state.message,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text('Tap the icon to try again ...',
+                    style: TextStyle(color: Colors.grey)),
+                SizedBox(height: 20),
+                Icon(
+                  Icons.refresh,
+                  size: 26,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (state is CategorySuccess) {
+      refreshTabs(state);
+      return Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: TabBarView(
           controller: _tabController,
-          children: widget.categories
-              .map((Category category) => ChartScreen(category: category))
+          children: state.categories
+              .map(
+                (Category category) => BlocProvider<PostBloc>(
+                  create: (context) =>
+                      PostBloc()..add(PostLoaded(category: category)),
+                  child: PostScreen(
+                    category: category,
+                  ),
+                ),
+              )
               .toList(),
         ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Image.asset(
-            'images/logo.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-        ),
-        // leadingWidth: 100,
-        elevation: 0,
+      );
+    }
 
-        actions: [
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfileScreen(state: widget.state)),
-                ),
-                child: Icon(
-                  Icons.person,
-                  size: 26.0,
-                  color: Colors.black,
-                ),
-              )),
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () => BlocProvider.of<AuthenticationBloc>(context).add(
-                  AuthenticationLoggedOut(),
-                ),
-                child: Icon(
-                  Icons.logout,
-                  size: 26.0,
-                  color: Colors.black,
-                ),
-              )),
-        ],
-        title: TitleBar(),
-        bottom: TabBar(
-//          labelPadding: EdgeInsets.only(
-//            top: 16,
-//            left: 16,
-//            right: 16,
-//          ),
-          labelColor: Color(0xff0531ff),
-          isScrollable: true,
-          labelStyle: TextStyle(
-            color: Colors.blue,
-            fontFamily: 'Montserrat',
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelColor: Color(0xffff4d00),
-          unselectedLabelStyle: TextStyle(
-            color: Colors.orange,
-            fontFamily: 'Montserrat',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          onTap: (i) {
-            _tabController.index = i;
-          },
-          indicator: BoxDecoration(),
-          controller: _tabController,
-          tabs: widget.categories
-              .map((Category e) => Tab(
-                    text: e.name,
-                  ))
-              .toList(),
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: Container(
+        child: Center(
+          child: CircularProgressIndicator(),
         ),
       ),
+    );
+  }
+
+  void refreshTabs(CategorySuccess state) {
+    this._tabController = TabController(
+        length: state.categories.length, vsync: this, initialIndex: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CategoryBloc, CategoryState>(
+      builder: (context, state) {
+        return Scaffold(
+          body: switchBody(state),
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            leading: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Image.asset(
+                'images/logo.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+            // leadingWidth: 100,
+            title: TitleBar(),
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 32.0),
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProfileScreen(state: widget.authState),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 20.0,
+                    color: Color(0xffff4d00),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+
+                    });
+                    BlocProvider.of<AuthenticationBloc>(context).add(
+                      AuthenticationLoggedOut(),
+                    );
+                    setState(() {});
+                  },
+                  child: Icon(
+                    Icons.logout,
+                    size: 20.0,
+                    color: Color(0xffff4d00),
+                  ),
+                ),
+              ),
+            ],
+            bottom: state is CategorySuccess
+                ? TabBar(
+                    labelColor: Color(0xff0531ff),
+                    isScrollable: true,
+                    labelStyle: TextStyle(
+                      color: Colors.blue,
+                      fontFamily: 'Montserrat',
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    unselectedLabelColor: Color(0xffff4d00),
+                    unselectedLabelStyle: TextStyle(
+                      color: Colors.orange,
+                      fontFamily: 'Montserrat',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    onTap: (i) {
+                      _tabController.index = i;
+                    },
+                    indicator: BoxDecoration(),
+                    controller: _tabController,
+                    tabs: state.categories
+                        .map((Category e) => Tab(
+                              text: e.name,
+                            ))
+                        .toList(),
+                  )
+                : null,
+          ),
+        );
+      },
     );
   }
 }

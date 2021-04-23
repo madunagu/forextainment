@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gravatar/flutter_gravatar.dart';
 import 'package:forextainment/bloc/states/AuthenticationState.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:forextainment/bloc/blocs/authentication.bloc.dart';
 import 'package:forextainment/bloc/events/AuthenticationEvent.dart';
 import 'package:forextainment/main.dart';
+import 'package:forextainment/widgets/TitleBar.dart';
 //dont let me move without you lord oh my God o my God take it away
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({@required this.state});
   final AuthenticationSuccess state;
+
+  String imageUrl(String email) {
+    final gravatar = Gravatar(email);
+    gravatar.imageUrl();
+    gravatar.profileUrl();
+    return gravatar.hash();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,30 +37,34 @@ class ProfileScreen extends StatelessWidget {
         title: TitleBar(),
         actions: [
           Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MainScreen(authState: state)),
+            padding: EdgeInsets.only(right: 32.0),
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(authState: state),
                 ),
-                child: Icon(
-                  Icons.home,
-                  size: 26.0,
-                  color: Colors.black,
-                ),
-              )),
+              ),
+              child: Icon(
+                Icons.home,
+                size: 20.0,
+                color: Color(0xffff4d00),
+              ),
+            ),
+          ),
           Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () => BlocProvider.of<AuthenticationBloc>(context).add(
-                  AuthenticationLoggedOut(),
-                ),
-                child: Icon(
-                  Icons.logout,
-                  size: 26.0,
-                  color: Colors.black,
-                ),
-              )),
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: () => BlocProvider.of<AuthenticationBloc>(context).add(
+                AuthenticationLoggedOut(),
+              ),
+              child: Icon(
+                Icons.logout,
+                size: 20.0,
+                color: Color(0xffff4d00),
+              ),
+            ),
+          ),
         ],
       ),
       body: Container(
@@ -79,7 +93,8 @@ class ProfileScreen extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 50.0,
                           backgroundImage: NetworkImage(
-                              'https://avatars0.githubusercontent.com/u/28812093?s=460&u=06471c90e03cfd8ce2855d217d157c93060da490&v=4'),
+                            "https://www.gravatar.com/avatar/"+imageUrl(state.user.email),
+                          ),
                         ),
                       ),
                     ],
@@ -88,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                   "${state.user.firstName} ${state.user.lastName}",
+                    "${state.user.firstName} ${state.user.lastName}",
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
@@ -141,43 +156,12 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                 ],
               ),
             )
           ],
         ),
       ),
-    );
-  }
-}
-
-class TitleBar extends StatelessWidget {
-  const TitleBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          'FOREX',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xff0531ff),
-          ),
-        ),
-        Text(
-          'TAINMENT',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xffff4d00),
-          ),
-        )
-      ],
     );
   }
 }

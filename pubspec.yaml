@@ -21,6 +21,7 @@ dependencies:
   meta: ^1.1.6
   json_serializable: ^3.3.0
   equatable: ^1.0.0
+  flutter_gravatar:
   photo_view:
 
 dev_dependencies:
@@ -55,5 +56,5 @@ flutter:
     - images/name.png
     - images/splash.png
     - images/chart.png
-    - images/BULLISH.png
-    - images/BEARISH.png
+    - images/bullish.png
+    - images/bearish.png

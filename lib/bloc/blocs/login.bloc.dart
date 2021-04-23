@@ -36,13 +36,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           password: event.password,
         );
 
-        authenticationBloc
-            .add(AuthenticationLoggedIn(token: data.token, user: data.user));
+        authenticationBloc.add(
+          AuthenticationLoggedIn(token: data.token, user: data.user),
+        );
         yield LoginInitial();
       } on ServerErrorException catch (error) {
         yield LoginFailure(
-          error:
-              'Unable to Log In, may be due to Incorrect Username and Password',
+          error: 'Unable to Register Contact Administrator',
         );
       } catch (error) {
         log(error.toString());
@@ -52,24 +52,26 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (event is RegisterButtonPressed) {
       yield LoginInProgress();
       try {
-        Map<String, dynamic> res =
-            await NetworkingClass().post('/users/register', {
-          'username': event.phone,
-          'first_name': event.firstName,
-          'last_name': event.lastName,
-          'email': event.email,
-          'password': event.password,
-        });
-        log(res.toString());
+        final LoginData data = await userRepository.register(
+          username: event.phone,
+          firstName: event.firstName,
+          lastName: event.lastName,
+          email: event.email,
+          phone: event.phone,
+          password: event.password,
+        );
+
+        log(data.toString());
 
         authenticationBloc.add(
           AuthenticationLoggedIn(
             token: 'loggedin',
             user: User(
-                email: event.email,
-                firstName: event.firstName,
-                lastName: event.lastName,
-                phone: event.phone),
+              email: event.email,
+              firstName: event.firstName,
+              lastName: event.lastName,
+              phone: event.phone,
+            ),
           ),
         );
         yield LoginInitial();
