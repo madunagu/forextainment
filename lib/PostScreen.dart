@@ -51,7 +51,6 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PostBloc, PostState>(
@@ -170,7 +169,15 @@ class ForexPost extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(post.outlook),
+                      Text(
+                        post.outlook,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: post.outlook == 'BULLISH'
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                      ),
                       Image.asset(
                         post.outlook == 'BULLISH'
                             ? 'images/bullish.png'
@@ -181,7 +188,6 @@ class ForexPost extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   SizedBox(height: 24),
                   ForexFigures(values: post.values),
                   SizedBox(height: 16),
